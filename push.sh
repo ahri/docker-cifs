@@ -1,5 +1,8 @@
 #!/bin/sh
-name="ahri/base"
+
+set -ue
+
+name=$(cat NAME)
 version=$(cat VERSION)
 
 tag="$name:$version"

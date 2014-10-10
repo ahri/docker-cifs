@@ -1,7 +1,7 @@
 FROM ahri/base
 
 ENV DOCKER_APP_NAME cifs
-ENV DOCKER_APP_DESC Expose arbitrary shares, including volumes
+ENV DOCKER_APP_DESC Expose arbitrary shares, including volumes over a Windows network
 
 RUN apt-get update -qq && \
     apt-get -qqy install samba && \

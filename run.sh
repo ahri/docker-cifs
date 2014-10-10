@@ -1,5 +1,8 @@
 #!/bin/sh
 
+set -ue
+
+name=$(cat NAME)
 version=$(cat VERSION)
 
 docker run -d \
@@ -8,7 +11,7 @@ docker run -d \
     -p 139:139 -p 445:445 \
     -v /mnt/media:/mnt/media \
     --volumes-from torrent \
-    ahri/samba:$version \
+    $name:$version \
     \
     playtime optitron \
     /mnt/media:share:r \

@@ -6,7 +6,7 @@ name=$(cat NAME)
 version=$(cat VERSION)
 
 docker run -d \
-    --name smb \
+    --name cifs \
     --restart="always" \
     -p 139:139 -p 445:445 \
     -v /mnt/media:/mnt/media \

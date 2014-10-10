@@ -1,4 +1,4 @@
-# ahri/samba
+# ahri/cifs
 
 Expose shares for r/rw guest access over SMB (Windows Networking) via a Docker
 container.

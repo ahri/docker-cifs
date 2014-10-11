@@ -62,6 +62,9 @@ while [[ $# -gt 0 ]]; do
 
    path = $path
    read only = $read_only
+
+   force user = docker-user
+   force group = docker-group
 EOF
 done
 

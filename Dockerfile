@@ -1,4 +1,4 @@
-FROM ahri/base
+FROM ahri/base:0.0.2
 
 RUN apt-get update -qq && \
     apt-get -qqy install samba && \

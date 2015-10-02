@@ -1,6 +1,8 @@
-#!/bin/bash
+#!/bin/sh
 
 set -ue
+
+smbconf_location="/smb.conf"
 
 err()
 {
@@ -10,49 +12,55 @@ err()
     exit 1
 }
 
-if [[ $# -lt 3 ]]; then
-    err "USAGE: $(basename "$0") WORKGROUP NETBIOS_NAME PATH:SHARE_NAME:MODE [PATH:SHARE_NAME:MODE]"
+if [ $# -lt 5 ]; then
+    err "USAGE: `basename "$0"` UID GID WORKGROUP NETBIOS_NAME PATH:SHARE_NAME:MODE [PATH:SHARE_NAME:MODE]"
 fi
 
-workgroup="$1"
-netbios_name="$2"
-shift 2
+uid="$1"
+gid="$2"
+workgroup="$3"
+netbios_name="$4"
+shift 4
 
-cat <<EOF > /etc/samba/smb.conf
+echo "All files will be accessed/written by uid $uid, gid $gid"
+echo "Identity: [$workgroup] $netbios_name"
+
+cat <<EOF > "$smbconf_location"
 workgroup = $workgroup
 netbios name = $netbios_name
 dns proxy = no
 syslog only = yes
 server role = standalone server
-security = share
+security = user
 guest account = nobody
 map to guest = bad user
 EOF
 
-while [[ $# -gt 0 ]]; do
-    split=(${1//:/ })
-    path="${split[0]}"
-    sharename="${split[1]}"
-    mode="${split[2]}"
+while [ $# -gt 0 ]; do
+    path="`echo "$1" | sed 's/:.*//'`"
+    sharename="`echo "$1" | sed 's/[^:]*://;s/:.*//'`"
+    mode="`echo "$1" | sed 's/.*://'`"
     shift
 
-    if [[ ! -d $path ]]; then
+    if [ ! -d $path ]; then
         err "ERROR: $path is not a directory"
     fi
 
     case $mode in
     r)
         read_only="yes"
+	echo "Serving $path as $sharename, read-only"
         ;;
     rw)
         read_only="no"
+	echo "Serving $path as $sharename, read-write"
         ;;
     *)
         err "ERROR: $mode is not a supported mode; r/rw"
         ;;
     esac
 
-    cat <<EOF >> /etc/samba/smb.conf
+    cat <<EOF >> "$smbconf_location"
 
 [$sharename]
    browseable = yes
@@ -63,9 +71,12 @@ while [[ $# -gt 0 ]]; do
    path = $path
    read only = $read_only
 
-   force user = docker-user
-   force group = docker-group
+   force user = $uid
+   force group = $gid
 EOF
 done
 
-/sbin/my_init
+smbd -s "$smbconf_location" -F -d 1 &
+nmbd -s "$smbconf_location" -F -d 1 &
+
+wait

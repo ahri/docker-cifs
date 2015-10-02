@@ -1,16 +1,11 @@
-FROM ahri/base:0.0.2
+FROM alpine:3.2
 
-RUN apt-get update -qq && \
-    apt-get -qqy install samba && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-
-RUN mkdir -p /etc/service/smbd /etc/service/nmbd
-ADD smbd.sh etc/service/smbd/run
-ADD nmbd.sh etc/service/nmbd/run
-ADD samba.sh samba.sh
+RUN apk add --update samba=4.2.1-r2 && \
+    rm -rf /var/cache/apk/*
 
 EXPOSE 139
 EXPOSE 445
+
+ADD samba.sh /
 
 ENTRYPOINT ["/samba.sh"]

@@ -10,4 +10,4 @@ cifs:
     volumes:
         - /mnt/media:/mnt/media
 
-    command: nobody nogroup playtime optitron /mnt/media:share:rw
+    command: nobody nobody playtime optitron /mnt/media:share:rw

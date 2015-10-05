@@ -1,5 +1,5 @@
 cifs:
-    image: ahri/cifs:0.0.4
+    image: ahri/cifs:0.0.5
 
     ports:
         - "139:139"
@@ -10,4 +10,4 @@ cifs:
     volumes:
         - /mnt/media:/mnt/media
 
-    command: nobody nobody playtime optitron /mnt/media:share:rw
+    command: 65534 65534 playtime optitron /mnt/media:share:rw

@@ -22,6 +22,17 @@ workgroup="$3"
 netbios_name="$4"
 shift 4
 
+if ! echo "$uid" | grep -Eq '^[0-9]+$'; then
+	err "ERROR: uid must be one or more digits"
+fi
+
+if ! echo "$gid" | grep -Eq '^[0-9]+$'; then
+	err "ERROR: gid must be one or more digits"
+fi
+
+echo "smbuser:x:$uid:$gid:Samba User:/:/sbin/nologin" >> /etc/passwd
+echo "smbgroup:x:$gid:" >> /etc/group
+
 echo "All files will be accessed/written by uid $uid, gid $gid"
 echo "Identity: [$workgroup] $netbios_name"
 
@@ -71,8 +82,8 @@ while [ $# -gt 0 ]; do
    path = $path
    read only = $read_only
 
-   force user = $uid
-   force group = $gid
+   force user = smbuser
+   force group = smbgroup
 EOF
 done
 
